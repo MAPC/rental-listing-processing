@@ -1,8 +1,10 @@
 import re
 import string
 import settings
+import itertools
 import pandas as pd
 from os import path
+from pprint import pprint
 from datetime import datetime
 from jellyfish import jaro_winkler
 
@@ -111,7 +113,7 @@ def clean_raw_listings(listings):
   listings['title'] = listings['title'].apply(lambda x: ' '.join(x.split()))
   listings['clean_title'] = listings['title'].apply(lambda x: re.sub(' ON | FOR | A | AT | WHERE | TO | THE | OF | WHEN | WITH | AND ', ' ', x))
 
-  return listings
+  return listings.reset_index()
 
 
 def duplicate_finder(listings):
@@ -127,7 +129,24 @@ def duplicate_finder(listings):
 
   duplicate_indices = []
 
+  listings = listings[['clean_title', 'ask', 'bedrooms']]
+  p = 0.1
 
+  for i in range(0, len(listings) - 10):
+    current_listing = listings.iloc[i]
+    scores = listings.iloc[i+1:i+10]['clean_title'].apply(lambda x: jaro_winkler(x, current_listing['clean_title']) + p).tolist()
+    indices_of_duplicates = [i + index + 1 for index, score in enumerate(scores) if score > 0.85]
+
+    duplicates = []
+    if len(indices_of_duplicates) > 0:
+      possible_duplicates = listings.iloc[indices_of_duplicates]
+      possible_duplicates = possible_duplicates[possible_duplicates['ask'] == current_listing['ask']]
+
+      if len(possible_duplicates) > 0:
+        duplicates = possible_duplicates[possible_duplicates['bedrooms'] == current_listing['bedrooms']]
+
+      if len(duplicates) > 0:
+        duplicate_indices.append({'title_index': i, 'duplicates': duplicates.index.tolist()})
 
   return listings
 

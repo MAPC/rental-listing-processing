@@ -138,7 +138,7 @@ Dupllicate_finder <- function(listing){
     tmp1 <- NULL
 
     temp1_dist <- stringdist(listing$title[i],listing$title[(i+1):(i+10)], method = "jw", p=0.1)
-    tmp1 <- i+ which(temp1_dist< 0.15)
+    tmp1 <- i+ which(temp1_dist > 0.85)
     tmp1 <- tmp1[which(listing$ask[i] == listing$ask[tmp1] )]
     
     if(length(tmp1 > 0)) {
