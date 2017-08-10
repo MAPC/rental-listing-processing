@@ -11,16 +11,20 @@ setwd("/usr/src/app")
 source("Data_prep.R")
 
 listings_unique <- clean_raw_listing(raw_listings)
-listingDup <- Dupllicate_finder(listings_unique)
+
+#listingDup <- Dupllicate_finder(listings_unique)
+
+listings_unique <- spatial_locator(listings_unique)
+no_studio_listing <- studio_analysis(listings_unique)
+clustering_data <- clustering_data_prep(no_studio_listing)
+
+
 #freq_wrd_one_gram <- n_gram_builder(listings_unique, 1)
 #freq_wrd_two_gram <- n_gram_builder(listings_unique,2)
 #freq_wrd_three_gram <- n_gram_builder(listings_unique,3)
 #freq_wrd_four_gram <- n_gram_builder(listings_unique,4)
 #freq_wrd_five_gram <- n_gram_builder(listings_unique,5)
 #freq_wrd_six_gram <- n_gram_builder(listings_unique,6)
-listings_unique <- spatial_locator(listings_unique)
-no_studio_listing <- studio_analysis(listings_unique)
-clustering_data <- clustering_data_prep(no_studio_listing)
 
 clustering_data$id <- NULL
 clustering_data <- as.matrix(clustering_data)

@@ -15,4 +15,5 @@ raw_listings = pd.read_csv(listings_path, names=listings_columns)
 
 # Start processing the listings data
 unique_listings = clean_raw_listings(raw_listings)
-duplicate_listings = duplicate_finder(unique_listings)
+#duplicate_listings = duplicate_finder(unique_listings)
+unique_listings = spatial_locator(unique_listings)

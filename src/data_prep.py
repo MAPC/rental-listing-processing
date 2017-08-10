@@ -2,6 +2,7 @@ import re
 import string
 import settings
 import itertools
+import shapefile
 import pandas as pd
 from os import path
 from pprint import pprint
@@ -31,7 +32,6 @@ def clean_raw_listings(listings):
 
   # Drop outliers
   listings = listings[(listings['ask'].astype(int) >= 400) & (listings['ask'].astype(int) <= 50000)]
-
 
   regex_title_transformations = {
     "[0-9]*BR[0-9]*BA": "[0-9]* BR [0-9]* BA",
@@ -71,7 +71,7 @@ def clean_raw_listings(listings):
     'TRANSIT': ['RED LINE ', 'BLUE LINE ', 'ORANGE LINE ', 'GREEN LINE ', 'SILVER LINE ', 'REDLINE ', 'BLUELINE ', 'ORANGELINE ', 'GREENLINE ', 'SILVERLINE ', ' T '],
     'WASHER/DRYER': [' W D '],
 
-    'ONE': [' 1 ', ' A '],
+    'ONE': [' 1 '],
     'TWO': [' 2 '],
     'THREE': [' 3 '],
     'FOUR': [' 4 '],
@@ -163,3 +163,39 @@ def n_gram_builder(listing, value):
 
 
   return listing
+
+
+def spatial_locator(listings):
+  """
+    To associate the town and census tract ID.
+
+    @param DataFrame listings
+
+    @return 
+  """
+
+  shape_files = [
+      'towns_MA', 
+      'comm_type', 
+      'census_tract', 
+      '1partner_city_nhoods', 
+      '2Bos_neighborhoods', 
+      '3MARKET AREAS NEW_region',
+  ]
+
+  for shape_file in shape_files:
+    file_path = path.join(settings.paths.SPATIAL, shape_file + '.shp')
+    print(file_path)
+    if not path.isfile(file_path):
+      print("{} file not available!".format(shape_file))
+      exit()
+
+  shapes = {}
+  for shape_file in shape_files:
+    shapes[shape_file] = shapefile.Reader(path.join(settings.paths.SPATIAL, shape_file))
+
+
+  
+  return listings
+
+

@@ -4,6 +4,7 @@ RUN set -ex; \
     \
     pip install \
       munch \
+      pyshp \
       pandas \
       jellyfish \
       python-dotenv
